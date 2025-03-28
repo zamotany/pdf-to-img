@@ -83,7 +83,6 @@ export async function pdf(
 }> {
   const data = await parseInput(input);
 
-  const canvasFactory = new NodeCanvasFactory();
   const pdfDocument = await pdfjs.getDocument({
     password: options.password, // retain for backward compatibility, but ensure settings from docInitParams overrides this and others, if given.
     standardFontDataUrl: path.join(pdfjsPath, `standard_fonts${path.sep}`),
@@ -91,7 +90,7 @@ export async function pdf(
     cMapPacked: true,
     ...options.docInitParams,
     isEvalSupported: false,
-    canvasFactory,
+    CanvasFactory: NodeCanvasFactory,
     data,
   }).promise;
 
@@ -102,7 +101,7 @@ export async function pdf(
 
     const viewport = page.getViewport({ scale: options.scale ?? 1 });
 
-    const { canvas, context } = canvasFactory.create(
+    const { canvas, context } = new NodeCanvasFactory().create(
       viewport.width,
       viewport.height,
       !!options.renderParams?.background
